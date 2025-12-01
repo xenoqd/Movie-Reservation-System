@@ -1,21 +1,20 @@
-from sqlmodel import SQLModel
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 from backend.models.user import UserRole
 
 
-class UserRead(SQLModel):
+class UserRead(BaseModel):
     id: int
     username: str
     email: str
     role: UserRole
 
 
-class UserCreate(SQLModel):
+class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
 
 
-class UserLogin(SQLModel):
+class UserLogin(BaseModel):
     login: str
     password: str

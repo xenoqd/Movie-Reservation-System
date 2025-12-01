@@ -18,6 +18,13 @@ class UserRepository:
         return user
 
     @staticmethod
+    async def get_by_user_id(session, user_id: int):
+        query = select(User).where(User.id == user_id)
+        result = await session.execute(query)
+        user = result.scalar_one_or_none()
+        return user
+
+    @staticmethod
     async def create_user(session, user: User):
         session.add(user)
         await session.commit()

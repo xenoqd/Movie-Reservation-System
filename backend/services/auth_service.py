@@ -3,10 +3,10 @@ from fastapi.exceptions import HTTPException
 from backend.models.user import User
 from backend.db.session import get_session
 from backend.repositories.user_repository import user_repo
-from backend.core.security import (
+from backend.core.security.jwt import create_access_token
+from backend.core.security.password import (
     get_password_hash,
     verify_password,
-    create_access_token,
 )
 from backend.models.user import UserRole
 
@@ -52,4 +52,5 @@ class AuthService:
             raise HTTPException(401, "Invalid password")
 
         token = create_access_token({"sub": str(user.id)})
-        return {"access_token": token, "token_type": "bearer"}
+        # return {"access_token": token, "token_type": "bearer"}
+        return token

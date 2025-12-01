@@ -1,6 +1,5 @@
-from sqlmodel import SQLModel
+from pydantic import BaseModel
 
-
-class TokenResponse(SQLModel):
+class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
