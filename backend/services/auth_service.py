@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from backend.models.user import User
 from backend.db.session import get_session
 from backend.repositories.user_repository import user_repo
-from backend.core.security.jwt import create_access_token
+from backend.core.security.jwt import create_access_token, create_refresh_token
 from backend.core.security.password import (
     get_password_hash,
     verify_password,
@@ -51,6 +51,10 @@ class AuthService:
         if not verify_password(user_data.password, user.hashed_password):
             raise HTTPException(401, "Invalid password")
 
-        token = create_access_token({"sub": str(user.id)})
-        # return {"access_token": token, "token_type": "bearer"}
-        return token
+        access_token = create_access_token({"sub": str(user.id)})
+        refresh_token = create_refresh_token({"sub": str(user.id)})
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }
