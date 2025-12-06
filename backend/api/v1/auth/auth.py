@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.services.auth_service import AuthService
 from backend.schemas.user import UserRead, UserCreate, UserLogin
-from backend.schemas.auth import TokenResponse
 
 from backend.db.session import get_session
 

@@ -16,7 +16,6 @@ async_session = None
 
 
 async def init_db():
-    """Инициализация базы данных и создание таблиц"""
     global engine, async_session
 
     await create_database_if_not_exists()
@@ -29,7 +28,6 @@ async def init_db():
 
 
 def create_engine_and_session():
-    """Просто создаем engine и session без создания таблиц"""
     global engine, async_session
 
     engine = create_async_engine(DATABASE_URL, echo=True)
@@ -37,6 +35,5 @@ def create_engine_and_session():
 
 
 async def get_session():
-    """Асинхронный генератор сессий для зависимостей FastAPI"""
     async with async_session() as session:
         yield session

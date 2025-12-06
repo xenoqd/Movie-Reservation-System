@@ -12,6 +12,8 @@ from backend.models.user import UserRole
 
 
 class AuthService:
+
+    
     @staticmethod
     async def register(user_data, session: AsyncSession):
         if session is None:
