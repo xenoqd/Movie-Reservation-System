@@ -12,8 +12,6 @@ from backend.models.user import UserRole
 
 
 class AuthService:
-
-    
     @staticmethod
     async def register(user_data, session: AsyncSession):
         if session is None:
@@ -53,10 +51,17 @@ class AuthService:
         if not verify_password(user_data.password, user.hashed_password):
             raise HTTPException(401, "Invalid password")
 
-        access_token = create_access_token({"sub": str(user.id)})
-        refresh_token = create_refresh_token({"sub": str(user.id)})
+        access_token = create_access_token(
+            {
+                "sub": str(user.id),
+                "role": user.role,
+            }
+        )
+        refresh_token = create_refresh_token(
+            {
+                "sub": str(user.id),
+                "role": user.role,
+            }
+        )
 
-        return {
-            "access_token": access_token,
-            "refresh_token": refresh_token
-        }
+        return {"access_token": access_token, "refresh_token": refresh_token}

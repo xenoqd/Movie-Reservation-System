@@ -33,7 +33,7 @@ class UserService:
         if current_user.role != UserRole.ADMIN:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, 
-                detail="Not enough rights"
+                detail="Insufficient permissions"
             )
 
         if target_user.role == UserRole.ADMIN:
