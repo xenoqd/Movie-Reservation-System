@@ -1,6 +1,6 @@
 from fastapi import Request, HTTPException, status
 from backend.core.config import settings
-from jose import jwt
+from jose import jwt, JWTError, ExpiredSignatureError
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
@@ -24,7 +24,13 @@ def get_admin_user(request: Request):
 
         return payload
 
-    except jwt.PyJWTError:
+    except ExpiredSignatureError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Jwt error"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired",
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
         )

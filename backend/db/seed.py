@@ -14,7 +14,7 @@ async def create_initial_admin(session: AsyncSession):
     if not admin:
         hashed_pw = get_password_hash("admin123")
         admin = User(
-            username="Initial Admin",
+            username="Admin",
             email="admin@example.com",
             hashed_password=hashed_pw,
             role=UserRole.ADMIN,

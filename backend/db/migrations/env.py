@@ -7,6 +7,8 @@ from alembic import context
 
 from backend.models.movie import Movie
 from backend.models.user import User
+from backend.models.showtime import Showtime
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

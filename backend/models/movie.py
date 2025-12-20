@@ -21,8 +21,7 @@ class Movie(SQLModel, table=True):
     description: Optional[str] = Field(default=None, nullable=True)
     poster_url: Optional[str] = Field(default=None, nullable=True)
     genre: Genre = Field(sa_column_kwargs={"nullable": False})
-    created_at: datetime = Field(default_factory=datetime.utcnow, sa_column=func.now())
+    created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None, nullable=True)
 
-
-#    showtimes: List["Showtime"] = Relationship(back_populates="movie")
+    showtimes: List["Showtime"] = Relationship(back_populates="movie")

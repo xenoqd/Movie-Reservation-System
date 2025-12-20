@@ -6,7 +6,7 @@ from backend.services.movie_service import MovieService
 from backend.db.session import get_session
 from backend.core.security.dependencies import get_admin_user
 
-movie_admin_router = APIRouter(prefix="/admin", tags=["admin"])
+movie_admin_router = APIRouter(prefix="/admin", tags=["admin", "movie_admin"])
 
 
 @movie_admin_router.post("/movies/create_movie")
@@ -38,7 +38,7 @@ async def edit_movie(
 
 
 @movie_admin_router.delete("/movies/{movie_id}")
-async def delet_movie(
+async def delete_movie(
     movie_id: int,
     user=Depends(get_admin_user),
     session: AsyncSession = Depends(get_session),

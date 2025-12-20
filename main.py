@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from backend.api.v1.auth.auth import auth_router
 from backend.api.v1.users.user import user_router
+from backend.api.v1.showtime.showtime import showtime_router
 
 from backend.api.v1.users.user_admin import user_admin_router
 from backend.api.v1.movie.movie_admin import movie_admin_router
+from backend.api.v1.showtime.showtime_admin import showtime_admin_router
 
 from backend.db import session as db_session
 from backend.db.seed import create_initial_admin
@@ -26,7 +28,8 @@ def root():
 
 app.include_router(user_admin_router)
 app.include_router(movie_admin_router)
-
+app.include_router(showtime_admin_router)
 
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(showtime_router)

@@ -49,7 +49,7 @@ class AuthService:
             raise HTTPException(400, "User not found")
 
         if not verify_password(user_data.password, user.hashed_password):
-            raise HTTPException(401, "Invalid password")
+            raise HTTPException(401, "Invalid password or login")
 
         access_token = create_access_token(
             {

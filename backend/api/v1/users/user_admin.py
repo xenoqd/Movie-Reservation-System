@@ -7,7 +7,7 @@ from backend.schemas.user import UserRead
 from backend.services.user_service import UserService
 from backend.db.session import get_session
 
-user_admin_router = APIRouter(prefix="/admin", tags=["admin"])
+user_admin_router = APIRouter(prefix="/admin", tags=["admin", "user_admin"])
 
 
 @user_admin_router.post(
