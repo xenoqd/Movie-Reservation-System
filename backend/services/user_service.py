@@ -1,7 +1,8 @@
 from backend.repositories.user_repository import user_repo
+from backend.core.exceptions import DomainError
 from backend.models.user import UserRole
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException, status
 
 
 class UserService:
@@ -19,27 +20,27 @@ class UserService:
         target_user = await user_repo.get_by_user_id(session, target_user)
 
         if not current_user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, 
-                detail="Acting user not found"
+            raise DomainError(
+                404,
+                "Acting user not found"
             )
 
         if not target_user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, 
-                detail="Target user not found"
+            raise DomainError(
+                404,
+                "Target user not found"
             )
 
         if current_user.role != UserRole.ADMIN:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, 
-                detail="Insufficient permissions"
+            raise DomainError(
+                403,
+                "Insufficient permissions"
             )
 
         if target_user.role == UserRole.ADMIN:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, 
-                detail="User already ADMIN"
+            raise DomainError(
+                404,
+                "User already ADMIN"
             )
 
         target_user.role = UserRole.ADMIN

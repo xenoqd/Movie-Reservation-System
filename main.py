@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
 from backend.api.v1.auth.auth import auth_router
 from backend.api.v1.users.user import user_router
 from backend.api.v1.showtime.showtime import showtime_router
@@ -9,6 +11,9 @@ from backend.api.v1.showtime.showtime_admin import showtime_admin_router
 
 from backend.db import session as db_session
 from backend.db.seed import create_initial_admin
+
+from backend.core.exceptions import DomainError
+
 
 app = FastAPI()
 
@@ -24,6 +29,14 @@ async def on_startup():
 @app.get("/")
 def root():
     return {"Hello": "World"}
+
+
+@app.exception_handler(DomainError)
+async def domain_exception_handler(request: Request, exc: DomainError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
 
 
 app.include_router(user_admin_router)

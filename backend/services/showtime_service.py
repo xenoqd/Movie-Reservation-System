@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.repositories.showtime_repository import ShowtimeRepository
 from backend.schemas.showtime import ShowtimeCreate, ShowtimeUpdate
+from backend.core.exceptions import DomainError
 from backend.models.showtime import Showtime
 
 
@@ -32,7 +33,7 @@ class ShowtimeService:
         showtime = await ShowtimeRepository.get_by_id(session, showtime_id)
 
         if not showtime:
-            return None
+            raise DomainError(404, "Showtime not found")
 
         for field, value in showtime_data.dict(exclude_unset=True).items():
             setattr(showtime, field, value)
@@ -53,7 +54,7 @@ class ShowtimeService:
         showtime = await ShowtimeRepository.get_by_id(session, showtime_id)
 
         if not showtime:
-            return False
+            raise DomainError(404, "Showtime not found")
 
         await ShowtimeRepository.delete(session, showtime)
 

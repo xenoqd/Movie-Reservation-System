@@ -1,14 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.exceptions import HTTPException
-from backend.models.user import User
+
+from backend.models.user import User, UserRole
 from backend.db.session import get_session
 from backend.repositories.user_repository import user_repo
+from backend.core.exceptions import DomainError
 from backend.core.security.jwt import create_access_token, create_refresh_token
 from backend.core.security.password import (
     get_password_hash,
     verify_password,
 )
-from backend.models.user import UserRole
 
 
 class AuthService:
@@ -19,7 +19,7 @@ class AuthService:
 
         existing = await user_repo.get_by_email(session, user_data.email)
         if existing:
-            raise HTTPException(400, "User already exists")
+            raise DomainError(400, "User already exists")
 
         user = User(
             username=user_data.username,
@@ -46,10 +46,10 @@ class AuthService:
             user = await user_repo.get_by_username(session, login)
 
         if not user:
-            raise HTTPException(400, "User not found")
+            raise DomainError(400, "User not found")
 
         if not verify_password(user_data.password, user.hashed_password):
-            raise HTTPException(401, "Invalid password or login")
+            raise DomainError(401, "Invalid password or login")
 
         access_token = create_access_token(
             {

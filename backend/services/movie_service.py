@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.repositories.movie_repository import MovieRepository
 from backend.schemas.movie import MovieCreate, MovieEdit
+from backend.core.exceptions import DomainError
 from backend.models.movie import Movie
 
 
@@ -27,7 +28,7 @@ class MovieService:
     ):
         movie = await MovieRepository.get_by_id(session, movie_id)
         if not movie:
-            return None
+            raise DomainError(404, "Movie not found")
 
         movie.title = movie_data.title
         movie.description = movie_data.description
@@ -47,7 +48,8 @@ class MovieService:
         movie = await MovieRepository.get_by_id(session, movie_id)
 
         if not movie:
-            return False
+            raise DomainError(404, "Movie not found")
+
 
         await MovieRepository.delete(session, movie)
         return True
