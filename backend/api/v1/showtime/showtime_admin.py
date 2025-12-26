@@ -5,6 +5,7 @@ from backend.core.security.dependencies import get_admin_user
 from backend.services.showtime_service import ShowtimeService
 from backend.schemas.showtime import ShowtimeCreate, ShowtimeUpdate
 from backend.db.session import get_session
+from backend.models.user import User
 
 showtime_admin_router = APIRouter(prefix="/admin/showtime", tags=["admin", "showtime_admin"])
 
@@ -12,7 +13,7 @@ showtime_admin_router = APIRouter(prefix="/admin/showtime", tags=["admin", "show
 @showtime_admin_router.post("")
 async def create_showtime(
     showtime_data: ShowtimeCreate,
-    user=Depends(get_admin_user),
+    _: User  = Depends(get_admin_user),
     session: AsyncSession = Depends(get_session),
 ):
 

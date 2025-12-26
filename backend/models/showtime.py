@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from sqlalchemy import Column, TIMESTAMP
 from sqlmodel import SQLModel, Field, Relationship
@@ -14,8 +14,9 @@ class Showtime(SQLModel, table=True):
         sa_column=Column(TIMESTAMP(timezone=True))
     )
     hall_number: int
-    capacity: int
+    capacity: int = Field(default=60)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None, nullable=True)
 
     movie: Optional["Movie"] = Relationship(back_populates="showtimes")
+    reservations: List["Reservation"] = Relationship(back_populates="showtime")

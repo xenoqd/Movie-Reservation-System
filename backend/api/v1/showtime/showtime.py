@@ -10,7 +10,6 @@ from backend.services.showtime_service import ShowtimeService
 showtime_router = APIRouter(prefix="/showtime", tags=["showtime"])
 
 
-
 @showtime_router.get("/{showtime_id}", response_model=ShowtimeRead)
 async def get_showtime(
     showtime_id: int,
@@ -21,9 +20,8 @@ async def get_showtime(
 
     if not showtime:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail="Showtime not found"
-            )
+            status_code=status.HTTP_404_NOT_FOUND, detail="Showtime not found"
+        )
 
     return showtime
 

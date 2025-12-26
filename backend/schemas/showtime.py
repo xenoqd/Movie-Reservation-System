@@ -1,13 +1,14 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel
 from typing import Optional
+from sqlmodel import Field
 
 class ShowtimeCreate(BaseModel):
     movie_id: int
     starts_at: datetime = datetime.now(timezone.utc)
     ends_at: datetime = datetime.now(timezone.utc)
     hall_number: int
-    capacity: int
+    capacity: int = Field(default=60)
 
 
 class ShowtimeUpdate(BaseModel):

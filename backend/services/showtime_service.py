@@ -26,9 +26,7 @@ class ShowtimeService:
 
     @staticmethod
     async def update_showtime(
-        session: AsyncSession,
-        showtime_id: int,
-        showtime_data: ShowtimeUpdate
+        session: AsyncSession, showtime_id: int, showtime_data: ShowtimeUpdate
     ):
         showtime = await ShowtimeRepository.get_by_id(session, showtime_id)
 
@@ -50,7 +48,6 @@ class ShowtimeService:
         session: AsyncSession,
         showtime_id: int,
     ):
-
         showtime = await ShowtimeRepository.get_by_id(session, showtime_id)
 
         if not showtime:
@@ -61,11 +58,12 @@ class ShowtimeService:
         return showtime
 
     @staticmethod
-    async def get_showtime_by_id(
-        session: AsyncSession,
-        showtime_id: int
-    ):
-        return await ShowtimeRepository.get_by_id(session, showtime_id)
+    async def get_showtime_by_id(session: AsyncSession, showtime_id: int):
+        showtime = await ShowtimeRepository.get_by_id(session, showtime_id)
+        if not showtime:
+            raise DomainError(404, "Showtime not found")
+
+        return showtime
 
     @staticmethod
     async def get_showtimes_by_filters(

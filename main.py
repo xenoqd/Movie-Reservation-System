@@ -4,10 +4,12 @@ from fastapi.responses import JSONResponse
 from backend.api.v1.auth.auth import auth_router
 from backend.api.v1.users.user import user_router
 from backend.api.v1.showtime.showtime import showtime_router
+from backend.api.v1.reservation.reservation import reservation_router
 
 from backend.api.v1.users.user_admin import user_admin_router
 from backend.api.v1.movie.movie_admin import movie_admin_router
 from backend.api.v1.showtime.showtime_admin import showtime_admin_router
+from backend.api.v1.reservation.reservation_admin import reservation_admin_router
 
 from backend.db import session as db_session
 from backend.db.seed import create_initial_admin
@@ -42,6 +44,8 @@ async def domain_exception_handler(request: Request, exc: DomainError):
 app.include_router(user_admin_router)
 app.include_router(movie_admin_router)
 app.include_router(showtime_admin_router)
+app.include_router(reservation_router)
+app.include_router(reservation_admin_router)
 
 app.include_router(auth_router)
 app.include_router(user_router)
