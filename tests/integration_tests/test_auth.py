@@ -35,4 +35,3 @@ def test_login_endpoint(client):
     )
 
     assert login_response.status_code == 200
-
