@@ -11,6 +11,14 @@ class ShowtimeRepository:
         return await session.get(Showtime, showtime_id)
 
     @staticmethod
+    async def get_by_id_with_lock(session: AsyncSession, showtime_id: int) -> Showtime:
+        query = select(Showtime).where(Showtime.id == showtime_id).with_for_update()
+        result = await session.execute(query)
+        showtime = result.scalar_one_or_none()
+
+        return showtime
+
+    @staticmethod
     async def create(session: AsyncSession, showtime: Showtime):
         session.add(showtime)
         await session.commit()
