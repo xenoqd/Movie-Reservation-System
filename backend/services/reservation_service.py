@@ -1,18 +1,27 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from backend.repositories.reservation_repository import ReservationRepository
 from backend.repositories.showtime_repository import ShowtimeRepository
 from backend.schemas.reservation import ReservationCreate
 from backend.core.exceptions import DomainError
 from backend.models.reservation import Reservation
+from backend.models.showtime import Showtime
 
 
 class ReservationService:
     @staticmethod
     async def create_reservation(
         session: AsyncSession, data: ReservationCreate, user_id: int
-    ):
-        showtime = await ShowtimeRepository.get_by_id(session, data.showtime_id)
+    ):  
+        # Race condition protecting
+        result = await session.execute(
+            select(Showtime)
+            .where(Showtime.id == data.showtime_id)
+            .with_for_update()
+        )
+        showtime = result.scalar_one_or_none()
+
         if not showtime:
             raise DomainError(404, "Showtime not found")
 
