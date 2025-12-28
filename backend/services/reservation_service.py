@@ -1,10 +1,11 @@
+from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.repositories.reservation_repository import ReservationRepository
 from backend.repositories.showtime_repository import ShowtimeRepository
 from backend.schemas.reservation import ReservationCreate
 from backend.core.exceptions import DomainError
-from backend.models.reservation import Reservation
+from backend.models.reservation import Reservation, ReservationStatus
 
 
 class ReservationService:
@@ -16,6 +17,9 @@ class ReservationService:
 
         if not showtime:
             raise DomainError(404, "Showtime not found")
+        
+        if showtime.starts_at <= datetime.now(timezone.utc):
+            raise DomainError(400, "Showtime already started")
 
         reserved = await ReservationRepository.count_reserved_seats(
             session, data.showtime_id
@@ -50,7 +54,15 @@ class ReservationService:
         if not is_admin and reservation.user_id != current_user_id:
             raise DomainError(400, "You can't cancel this reservation")
 
-        await ReservationRepository.delete(session, reservation)
+        if reservation.status != ReservationStatus.ACTIVE:
+            raise DomainError(400, "Reservation not active")
+
+        if reservation.showtime.starts_at <= datetime.now(timezone.utc):
+            raise DomainError(400, "Cannot cancel started showtime")
+
+        reservation.status = ReservationStatus.CANCELLED
+
+        await ReservationRepository.create(session, reservation)
 
     @staticmethod
     async def get_user_reservation(session: AsyncSession, user_id: int):

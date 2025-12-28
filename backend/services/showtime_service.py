@@ -15,6 +15,9 @@ class ShowtimeService:
         session: AsyncSession,
         showtime_data: ShowtimeCreate,
     ):
+        if not showtime_data.movie_id:
+            raise DomainError(400,"Movie not found")
+
         showtime = Showtime(
             movie_id=showtime_data.movie_id,
             starts_at=showtime_data.starts_at,

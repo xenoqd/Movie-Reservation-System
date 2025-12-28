@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlalchemy import select, func
 
-from backend.models.reservation import Reservation
+from backend.models.reservation import Reservation, ReservationStatus
 
 
 class ReservationRepository:
@@ -19,7 +20,13 @@ class ReservationRepository:
 
     @staticmethod
     async def get_by_id(session: AsyncSession, reservation_id: int):
-        return await session.get(Reservation, reservation_id)
+        query = (
+            select(Reservation)
+            .options(selectinload(Reservation.showtime))
+            .where(Reservation.id == reservation_id)
+        )
+        result = await session.execute(query)
+        return result.scalars().first()
 
     @staticmethod
     async def get_by_user(session: AsyncSession, user_id: int):
@@ -36,7 +43,8 @@ class ReservationRepository:
     @staticmethod
     async def count_reserved_seats(session: AsyncSession, showtime_id: int):
         query = select(func.coalesce(func.sum(Reservation.seats_reserved), 0)).where(
-            Reservation.showtime_id == showtime_id
+            Reservation.showtime_id == showtime_id,
+            Reservation.status == ReservationStatus.ACTIVE
         )
         result = await session.execute(query)
         return result.scalar() or 0
