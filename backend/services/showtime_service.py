@@ -1,8 +1,9 @@
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.repositories.movie_repository import MovieRepository
 from backend.repositories.showtime_repository import ShowtimeRepository
 from backend.schemas.showtime import ShowtimeCreate, ShowtimeUpdate
 from backend.core.exceptions import DomainError
@@ -15,8 +16,29 @@ class ShowtimeService:
         session: AsyncSession,
         showtime_data: ShowtimeCreate,
     ):
-        if not showtime_data.movie_id:
-            raise DomainError(400,"Movie not found")
+        movie = await MovieRepository.get_by_id(session, showtime_data.movie_id)
+        if not movie:
+            raise DomainError(404, "Movie not found")
+
+        duration = showtime_data.ends_at - showtime_data.starts_at
+
+        if duration.total_seconds() <= 0:
+            raise DomainError(400, "Showtime end must be after start")
+
+        if duration < timedelta(minutes=30):
+            raise DomainError(400, "Showtime is too short")
+
+        if duration > timedelta(hours=6):
+            raise DomainError(400, "Showtime is too long")
+
+        overlap = await ShowtimeRepository.find_overlap(
+            session,
+            hall_number=showtime_data.hall_number,
+            starts_at=showtime_data.starts_at,
+            ends_at=showtime_data.ends_at,
+        )
+        if overlap:
+            raise DomainError(400,"Showtime overlaps with another showtime in this hall")
 
         showtime = Showtime(
             movie_id=showtime_data.movie_id,

@@ -19,6 +19,22 @@ class ShowtimeRepository:
         return showtime
 
     @staticmethod
+    async def find_overlap(
+        session: AsyncSession,
+        hall_number: int,
+        starts_at: datetime,
+        ends_at: datetime,
+    ):
+        stmt = select(Showtime).where(
+            Showtime.hall_number == hall_number,
+            Showtime.starts_at < ends_at,
+            Showtime.ends_at > starts_at,
+        )
+
+        result = await session.execute(stmt)
+        return result.scalars().first() is not None
+
+    @staticmethod
     async def create(session: AsyncSession, showtime: Showtime):
         session.add(showtime)
         await session.commit()
