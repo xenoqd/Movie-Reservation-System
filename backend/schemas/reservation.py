@@ -1,9 +1,10 @@
 from sqlmodel import SQLModel
+from typing import List
 
 
 class ReservationCreate(SQLModel):
     showtime_id: int
-    seats: int = 1
+    seat_ids: List[int]
 
 
 class ReservationRead(SQLModel):

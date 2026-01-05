@@ -12,7 +12,7 @@ from backend.api.v1.showtime.showtime_admin import showtime_admin_router
 from backend.api.v1.reservation.reservation_admin import reservation_admin_router
 
 from backend.db import session as db_session
-from backend.db.seed import create_initial_admin
+from backend.db.seed import create_initial_admin,  create_initial_seats
 
 from backend.core.exceptions import DomainError
 
@@ -26,6 +26,7 @@ async def on_startup():
 
     async with db_session.async_session() as session:
         await create_initial_admin(session)
+        await create_initial_seats(session)
 
 
 @app.get("/")

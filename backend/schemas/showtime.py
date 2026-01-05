@@ -1,3 +1,4 @@
+from backend.models.showtime import ShowtimeStatus
 from datetime import datetime, timezone
 from pydantic import BaseModel
 from typing import Optional

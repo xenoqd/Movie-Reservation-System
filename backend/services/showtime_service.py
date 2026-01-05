@@ -3,11 +3,16 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.repositories.movie_repository import MovieRepository
+from backend.repositories.showtime_seat_repository import ShowtimeSeatRepository
 from backend.repositories.showtime_repository import ShowtimeRepository
+from backend.repositories.movie_repository import MovieRepository
+from backend.repositories.seat_repository import SeatRepository
+
 from backend.schemas.showtime import ShowtimeCreate, ShowtimeUpdate
 from backend.core.exceptions import DomainError
-from backend.models.showtime import Showtime
+
+from backend.models.showtime import Showtime, ShowtimeStatus
+from backend.models.showtime_seat import ShowtimeSeat
 
 
 class ShowtimeService:
@@ -47,7 +52,34 @@ class ShowtimeService:
             hall_number=showtime_data.hall_number,
             capacity=showtime_data.capacity,
         )
-        return await ShowtimeRepository.create(session, showtime)
+
+        created_showtime = await ShowtimeRepository.create(session, showtime)
+
+        all_seats = await SeatRepository.get_all(session)
+
+        if len(all_seats) != created_showtime.capacity:
+            await session.delete(created_showtime)
+            await session.commit()
+            raise DomainError(
+                500,
+                f"Capacity mismatch: expected {created_showtime.capacity} seats, "
+                f"but found {len(all_seats)}. Check init_seats()."
+            )
+
+        showtime_seats = [
+            ShowtimeSeat(
+                showtime_id=created_showtime.id,
+                seat_id=seat.id,
+                is_reserved=False
+            )
+            for seat in all_seats
+        ]
+
+        await ShowtimeSeatRepository.create_many(session, showtime_seats)
+
+        await session.refresh(created_showtime)
+
+        return created_showtime
 
     @staticmethod
     async def update_showtime(
@@ -69,7 +101,7 @@ class ShowtimeService:
         return showtime
 
     @staticmethod
-    async def delete_showtime(
+    async def cancel_showtime(
         session: AsyncSession,
         showtime_id: int,
     ):
@@ -78,7 +110,12 @@ class ShowtimeService:
         if not showtime:
             raise DomainError(404, "Showtime not found")
 
-        await ShowtimeRepository.delete(session, showtime)
+        if showtime.status.CANCELLED:
+            raise DomainError(400, "Showtime already Cancelled")
+
+        showtime.status = ShowtimeStatus.CANCELLED
+
+        await ShowtimeRepository.create(session, showtime)
 
         return showtime
 

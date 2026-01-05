@@ -6,16 +6,31 @@ from datetime import datetime
 from backend.db.session import get_session
 from backend.schemas.showtime import ShowtimeRead
 from backend.services.showtime_service import ShowtimeService
+from backend.services.showtime_seat_service import ShowtimeSeatService
 
 showtime_router = APIRouter(prefix="/showtime", tags=["showtime"])
 
+@showtime_router.get("/{showtime_id}/seats")
+async def get_showtime_seats(
+    showtime_id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    seats = await ShowtimeSeatService.get_hall_schema(session, showtime_id)
+    return seats
+
+@showtime_router.get("/{showtime_id}/seats/available")
+async def get_available_seats(
+    showtime_id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    seats = await ShowtimeSeatService.get_available_seats(session, showtime_id)
+    return seats
 
 @showtime_router.get("/{showtime_id}", response_model=ShowtimeRead)
 async def get_showtime(
     showtime_id: int,
     session: AsyncSession = Depends(get_session),
 ):
-
     showtime = await ShowtimeService.get_showtime_by_id(session, showtime_id)
 
     if not showtime:

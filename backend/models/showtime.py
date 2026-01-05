@@ -1,22 +1,29 @@
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, TIMESTAMP
+
 from typing import Optional, List
 from datetime import datetime
-from sqlalchemy import Column, TIMESTAMP
-from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum
+
+
+class ShowtimeStatus(str, Enum):
+    SCHEDULED = "scheduled"
+    CANCELLED = "cancelled"
+    FINISHED = "finished"
+    DRAFT = "draft"
 
 
 class Showtime(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     movie_id: int = Field(foreign_key="movie.id")
-    starts_at: datetime = Field(
-        sa_column=Column(TIMESTAMP(timezone=True))
-    )
-    ends_at: datetime = Field(
-        sa_column=Column(TIMESTAMP(timezone=True))
-    )
+    starts_at: datetime = Field(sa_column=Column(TIMESTAMP(timezone=True)))
+    ends_at: datetime = Field(sa_column=Column(TIMESTAMP(timezone=True)))
     hall_number: int
     capacity: int = Field(default=60)
+    status: ShowtimeStatus = Field(default=ShowtimeStatus.DRAFT)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None, nullable=True)
 
-    movie: Optional["Movie"] = Relationship(back_populates="showtimes")
     reservations: List["Reservation"] = Relationship(back_populates="showtime")
+    seats: List["ShowtimeSeat"] = Relationship(back_populates="showtime")
+    movie: Optional["Movie"] = Relationship(back_populates="showtimes")

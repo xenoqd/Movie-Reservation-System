@@ -7,7 +7,9 @@ from alembic import context
 
 from backend.models.movie import Movie
 from backend.models.user import User
+from backend.models.seat import Seat
 from backend.models.showtime import Showtime
+from backend.models.showtime_seat import ShowtimeSeat
 from backend.models.reservation import Reservation
 
 

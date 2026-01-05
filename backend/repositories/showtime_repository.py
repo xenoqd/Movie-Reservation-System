@@ -25,13 +25,13 @@ class ShowtimeRepository:
         starts_at: datetime,
         ends_at: datetime,
     ):
-        stmt = select(Showtime).where(
+        query = select(Showtime).where(
             Showtime.hall_number == hall_number,
             Showtime.starts_at < ends_at,
             Showtime.ends_at > starts_at,
         )
 
-        result = await session.execute(stmt)
+        result = await session.execute(query)
         return result.scalars().first() is not None
 
     @staticmethod
@@ -40,11 +40,6 @@ class ShowtimeRepository:
         await session.commit()
         await session.refresh(showtime)
         return showtime
-
-    @staticmethod
-    async def delete(session: AsyncSession, showtime: Showtime):
-        await session.delete(showtime)
-        await session.commit()
 
     @staticmethod
     async def read_showtime_by_filters(
